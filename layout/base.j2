@@ -1,0 +1,66 @@
+{# -*- html -*- #}
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="{{ resource.meta.language }}"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="{{ resource.meta.language }}"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="{{ resource.meta.language }}"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="{{ resource.meta.language }}"> <!--<![endif]-->
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>{{ resource.meta.title|e }} | {{ resource.meta.author|e }}</title>
+  <meta name="keywords" content="{{ resource.meta.keywords|e }}">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="{{resource.meta.author|e}} is a Senior Software Engineer, specializing in web application development. He currently lives in Beijing, China." />
+  <meta name="author" content="{{ resource.meta.author|e }}">
+  <link rel="canonical" href="{{base}}{{ content_url(resource.url) }}" />
+  <!--<link rel="alternate" href="{{ content_url( resource.meta.language + '/blog/atom.xml') }}" type="application/atom+xml" title="ATOM feed">-->
+  <link rel="icon" href="{{ media_url('favicon.ico') }}">
+  <link rel="shortcut icon" href="{{ media_url('favicon.ico') }}">
+  <link rel="stylesheet/less" href="{{ media_url('less/style.less') }}">
+  <script src="{{ media_url('js/libs/less-1.3.0.min.js') }}"></script> 
+  <!--<link rel="stylesheet" href="{{ media_url('css/style.css') }}" type="text/css">-->
+  <!--[if lt IE 9]>
+   <script src="{{ media_url('js/libs/html5-3.4-respond-1.1.0.min.js') }}"></script>
+  <![endif]-->
+  <script src="{{ media_url('js/top-js.js') }}"></script>
+</head>
+{% if resource.meta.onload is defined %}
+  <body onLoad="{{ resource.meta.onload }}">
+{% else %}
+  <body>
+{% endif %}
+
+  {% block header %}
+    <div id="header-container">
+      <header class="wrapper clearfix">
+        <h1 id="title">{{resource.meta.title|typogrify|e}}</h1>      
+      </header>
+    </div>
+  {% endblock %}
+  <div id="main-container" class="home">     
+    <div id="main" class="wrapper clearfix">   
+      {% block main %}     
+        <article >
+          {% if resource.meta.pclass is defined %}
+            <p class="{{ resource.meta.pclass }}">
+          {% else %}
+            <p>
+          {% endif %}          
+            {% filter markdown|typogrify -%}
+              {% mark article -%}{% block article -%}{%- endblock %}{%- endmark %}
+            {%- endfilter %}
+          </p>
+        </article >
+      {% endblock %}
+    </div> <!-- #main -->
+  </div> <!-- #main-container -->
+  
+  <div id="footer-container">
+    <footer class="wrapper">
+      <h3>Copyleft <span class="copyleft">&copy;</span> 2012 {{ resource.meta.author|e }} - All Wrongs Reserved.</h3>
+    </footer>
+  </div>
+  <script src="{{ media_url('js/bottom-js.js') }}" async></script>
+  {% include "analytics.j2" %}
+</body>
+</html>
