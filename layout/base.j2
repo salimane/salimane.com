@@ -6,7 +6,7 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="{{ resource.meta.language }}"> <!--<![endif]-->
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <title>{{ resource.meta.title|e }} | {{ resource.meta.author|e }}</title>
+  <title>{{ resource.meta.title|e }} {% if resource.meta.title %}|{% endif %} {{ resource.meta.author|e }}</title>
   <meta name="keywords" content="{{ resource.meta.keywords|e }}">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -57,7 +57,9 @@
   
   <div id="footer-container">
     <footer class="wrapper">
-      <h3>Copyleft <span class="copyleft">&copy;</span> 2012 {{ resource.meta.author|e }} - All Wrongs Reserved.</h3>
+      {% if resource.meta.author %}
+        <h3>Copyleft <span class="copyleft">&copy;</span> 2012 {{ resource.meta.author|e }} - All Wrongs Reserved.</h3>
+      {% endif %} 
     </footer>
   </div>
   <script src="{{ media_url('js/bottom-js.js') }}" async></script>

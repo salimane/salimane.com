@@ -1,7 +1,7 @@
 extends: "site.yaml"
 mode: production
-media_url: //salimane.cloudfront.net/
-deploy_root: '.final'
+media_url: //salimane.com/
+deploy_root: '/home/salimane/htdocs/salimane.github.com'
 plugins:
   - hyde.ext.plugins.meta.MetaPlugin
   - hyde.ext.plugins.git.GitDatesPlugin
