@@ -1,18 +1,26 @@
 ---
 extends: base.j2
 default_block: article
-description: Language selection page
+keywords: "salimane adjao moustapha, bio"
+uuid: f0acd127-88d0-4044-a9f6-f57c0b9d9d3b
 class: main-title
-title: ''
-author: ''
-created:
+pclass: front
 ---
 
-<script>
-{% for code, lang in languages %}
-  if (navigator.language.split(/-/)[0] === "{{ code }}")
-     location.href = "{{ content_url(code) }}";
-  else
-{%- endfor %}
- null;
-</script>
+Salimane Adjao Moustapha is a [Senior Software Engineer][wp-engineer] who specialises in [web application][webapp] development.
+He works for [7k7k][7k7k] and maintains a [linkedin profile][linkedin]. He socializes on [Google+][g+] when he's not hacking some [little scripts][github].
+You can reach him by <script type="text/javascript"> write_email(); </script> and he currently lives in [Beijing, China][beijing].
+
+[wp-engineer]: http://en.wikipedia.org/wiki/Software_engineer
+[webapp]: http://en.wikipedia.org/wiki/Web_application
+[7k7k]: http://www.7k7k.com
+[linkedin]: http://www.linkedin.com/in/salimane
+[g+]: https://www.google.com/profiles/salimane
+[github]: http://github.com/salimane
+[posts]: [[en/posts/]]
+[setup]: [[en/setup/]]
+[beijing]: http://maps.google.com/maps?f=q&amp;hl=en&amp;q=Beijing,+China&amp;ie=UTF8&amp;om=1&amp;z=13&amp;iwloc=addr 
+
+{# Local Variables: #}
+{# mode: markdown   #}
+{# End:             #}
