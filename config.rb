@@ -1,3 +1,11 @@
+
+activate :livereload
+activate :blog
+activate :drafts
+activate :i18n, :mount_at_root => :en
+activate :image_optim
+
+Time.zone = "Shanghai"
 ###
 # Compass
 ###
@@ -87,24 +95,40 @@ end
 # Change the images directory
 # set :images_dir, "alternative_image_directory"
 
+activate :blog do |blog|
+  # set options on blog
+  blog.prefix = "posts"
+  blog.layout = "post_layout"
+end
+
+activate :directory_indexes
+page "/404.html", directory_index: false
+
 # Build-specific configuration
 configure :build do
+
+
   # For example, change the Compass output style for deployment
-  # activate :minify_css
+  activate :minify_css
 
   # Minify Javascript on build
-  # activate :minify_javascript
+  activate :minify_javascript
 
-  # Enable cache buster
-  # activate :cache_buster
+  # Enable Uniquely-named assets
+  activate :asset_hash
 
   # Use relative URLs
-  # activate :relative_assets
+  activate :relative_assets
 
   # Compress PNGs after build
-  # First: gem install middleman-smusher
   # require "middleman-smusher"
-  # activate :smusher
+  activate :smusher
+
+  #Minify HTML
+  activate :minify_html
+
+  #GZIP text files
+  activate :gzip
 
   # Or use a different image path
   # set :http_path, "/Content/images/"
