@@ -3,9 +3,11 @@
 
 # TEAM
 
-    Salimane Adjao Moustapha -- Developer -- @salimane
+    Salimane Adjao Moustapha -- Developer, Designer, and UX -- @salimane
 
 # TECHNOLOGY COLOPHON
 
-    HTML5, CSS3
-    jQuery, Modernizr
+    HTML5, CSS3,
+    jQuery, Modernizr,
+    Middleman, Sass,
+    Compass,

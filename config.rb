@@ -1,22 +1,91 @@
+require "bundler"
+require "kramdown"
+require "sanitize"
+require "lib/uuid"
+require "date"
+require 'ostruct'
+require 'yaml'
+
+#require "lib/uuid"
+
+###
+# Site-wide settings
+###
 
 activate :livereload
-activate :blog
-activate :drafts
 activate :i18n, :mount_at_root => :en
-activate :image_optim
 
-Time.zone = "Shanghai"
-###
+@website = OpenStruct.new(YAML::load_file(File.dirname(__FILE__) + "/config.yaml")[:website])
+
+# Create an RFC4122 UUID http://www.ietf.org/rfc/rfc4122.txt
+set :uuid, UUID.create_sha1('salimane.com', UUID::NameSpace_URL)
+
 # Compass
+compass_config do |config|
+  config.output_style = :expanded
+end
+
+###
+# Blog settings
 ###
 
-# Susy grids in Compass
-require 'susy'
+Time.zone = "Asia/Shanghai"
 
-# Change Compass configuration
-# compass_config do |config|
-#   config.output_style = :compact
-# end
+activate :blog do |blog|
+  # set options on blog
+  blog.layout = "post"
+  blog.permalink = "posts/:title"
+end
+
+# Assemble resources to generate posts pages, Atom & JSON feeds
+ready do
+  posts_resources = []
+  blog.articles.group_by {|a| a.date.year }.each do |year, year_posts|
+    posts_resources << {:year => year, :articles => year_posts}
+  end
+  page "/posts.html", :layout => :generic do
+    @archives = posts_resources
+  end
+  blog.articles.each do |a|
+    page "#{a.url}atom.xml", :proxy => "/atom_single.xml", :layout => false, :ignore => true do
+      @atom_post = a
+    end
+    page "#{a.url}atom.json", :proxy => "/json_single.json", :layout => false, :ignore => true do
+      @atom_post = a
+    end
+  end
+end
+
+activate :directory_indexes
+
+set :markdown_engine, :kramdown
+set :markdown, :layout_engine => :haml,
+:autolink => true,
+:smartypants => true
+
+###
+# Page command
+###
+
+#page "/index.html", :layout => :generic
+page "404.html", :layout => false
+page "/posts/index.html", :layout => false
+page "/sitemap.xml", :layout => "sitemap.xml"
+page "/feed.rss", :layout => "feed.rss"
+page "/atom.xml", :layout => "atom.xml"
+page "/atom.json", :proxy => "/json_articles.json", :layout => false, :ignore => true do
+  @atom_article = ''
+end
+
+###
+# Code Highlighting
+###
+
+use Rack::Codehighlighter,
+:pygments_api,
+:element => "pre>code",
+:pattern => /\A:::([-_+\w]+)\s*\n/,
+:markdown => true
 
 ###
 # Haml
@@ -24,36 +93,11 @@ require 'susy'
 
 # CodeRay syntax highlighting in Haml
 # First: gem install haml-coderay
-# require 'haml-coderay'
+require 'haml-coderay'
 
 # CoffeeScript filters in Haml
 # First: gem install coffee-filter
 # require 'coffee-filter'
-
-# Automatic image dimensions on image_tag helper
-# activate :automatic_image_sizes
-
-###
-# Page command
-###
-
-# Per-page layout changes:
-#
-# With no layout
-# page "/path/to/file.html", :layout => false
-#
-# With alternative layout
-# page "/path/to/file.html", :layout => :otherlayout
-#
-# A path which all have the same layout
-# with_layout :admin do
-#   page "/admin/*"
-# end
-
-# Proxy (fake) files
-# page "/this-page-has-no-template.html", :proxy => "/template-file.html" do
-#   @which_fake_page = "Rendering a fake page with a variable"
-# end
 
 ###
 # Helpers
@@ -61,6 +105,20 @@ require 'susy'
 
 # Methods defined in the helpers block are available in templates
 helpers do
+  # Properly format a content_entry_asset
+  def entry_asset(img, url = nil)
+    img_tag = image_tag img[:url], :itemprop => "image", :alt => img[:alt], :title => img[:title]
+    unless url.nil?
+      img_tag = link_to img_tag, url
+    end
+    '<div class="entry-content-asset photo-full">' + img_tag + '</div>'
+  end
+
+  # Strip all HTML tags from string
+  def strip_tags(html)
+    Sanitize.clean(html.strip).strip
+  end
+
   # Calculate the years for a copyright
   def copyright_years(start_year)
     end_year = Date.today.year
@@ -84,29 +142,38 @@ helpers do
     img
   end
 
+  def all_posts
+    posts = Dir["source/posts/*.html.*"]
+    sorted_posts = posts.sort_by { |filename| File.mtime(filename) }
+
+    return sorted_posts
+  end
+
+  def path_to_link(path)
+    file = path.split("/").last
+    title = file.sub(/\.haml/,"")
+    "posts/#{title}"
+  end
+
+  def path_to_title(path)
+    file = path.split("/").last
+    title = file.split(".").first
+    title.gsub(/-/," ").capitalize
+  end
+
 end
 
-# Change the CSS directory
-# set :css_dir, "alternative_css_directory"
+set :css_dir, 'stylesheets'
 
-# Change the JS directory
-# set :js_dir, "alternative_js_directory"
+set :js_dir, 'javascripts'
 
-# Change the images directory
-# set :images_dir, "alternative_image_directory"
-
-activate :blog do |blog|
-  # set options on blog
-  blog.prefix = "posts"
-  blog.layout = "post_layout"
-end
-
-activate :directory_indexes
-page "/404.html", directory_index: false
+set :images_dir, 'images'
 
 # Build-specific configuration
 configure :build do
 
+  # Automatic image dimensions on image_tag helper
+  activate :automatic_image_sizes
 
   # For example, change the Compass output style for deployment
   activate :minify_css
@@ -124,12 +191,20 @@ configure :build do
   # require "middleman-smusher"
   activate :smusher
 
+  activate :image_optim
+
   #Minify HTML
   activate :minify_html
 
   #GZIP text files
   activate :gzip
 
-  # Or use a different image path
-  # set :http_path, "/Content/images/"
+  # Change Compass configuration
+  compass_config do |config|
+    config.output_style = :compressed
+  end
+
+  # Make favicons
+  #activate :favicon_maker
+
 end
